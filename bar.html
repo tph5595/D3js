@@ -4,10 +4,91 @@
     <meta charset="utf-8">
     <title>Pretty Bar charts</title>
     <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <style media="screen">
+    html {
+    height: 100%;
+}
+      :root {
+        --grad-start: #37474F;
+        --grad-end: #37474F;
+      }
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        background-repeat: no-repeat;
+        height: 100%;
+        background-attachment: fixed;
+
+        background: #FFF59D; /* For browsers that do not support gradients */
+        background: -webkit-linear-gradient(right top, var(--grad-start), var(--grad-end)); /* For Safari 5.1 to 6.0 */
+        background: -o-linear-gradient(bottom left, var(--grad-start), var(--grad-end)); /* For Opera 11.1 to 12.0 */
+        background: -moz-linear-gradient(bottom left, var(--grad-start), var(--grad-end)); /* For Firefox 3.6 to 15 */
+        background: linear-gradient(to bottom left, var(--grad-start), var(--grad-end)); /* Standard syntax */
+      }
+      h1 {
+        font-size: 8em;
+        color: #B2DFDB;
+      }
+      div#bars {
+        background-color: #ECEFF1;
+        padding: 50px;
+        width: 600px;
+        box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+        border-radius: 15px;
+      }
+    </style>
   </head>
   <body>
-    <script type="text/javascript">
+    <center>
+      <h1>Pretty Bar Chart</h1>
+      <div id="bars">
 
+      </div>
+    <script type="text/javascript">
+      //Customizable variables
+      var dataArr = [10,20,30,40,50,60];
+      var width = 500;
+      var height = 500;
+      var spaceBetween = 1.25;
+      var startColor = "#7C4DFF"; //Google Material design deep purple A200
+      var endColor = "#1DE9B6";   //Google Material design teal A400
+
+      //Functionality beyond this point
+      var arrayMax = Math.max.apply(null, dataArr);
+      var arraySize = dataArr.length;
+
+      var barWidth = width/arraySize;
+      if(spaceBetween > 0){
+          barWidth = width/(arraySize*spaceBetween);
+      }
+
+      var scaleh = d3.scaleLinear()
+                    .domain([0, arrayMax])
+                    .range([0, height]);
+      var scalew = d3.scaleLinear()
+                    .domain([0, (arraySize)-1])
+                    .range([0, width-(barWidth)]);
+      var scalec = d3.scaleLinear()
+                    .domain([0, arrayMax])
+                    .range([startColor, endColor]);
+
+      var canvas = d3.select("div#bars")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .style("display", "block")
+                        .style("margin", "auto");
+                        //.style("margin-top", "200px");
+
+      var bars = canvas.selectAll("rect")
+                        .data(dataArr)
+                        .enter()
+                            .append("rect")
+                            .attr("width", barWidth)
+                            .attr("height", function(d) { return scaleh(d); })
+                            .attr("y", function(d) { return height-(scaleh(d)); })
+                            .attr("x", function(d, i) { return scalew(i); })
+                            .attr("fill", function(d){ return scalec(d); });
     </script>
+  </center>
   </body>
 </html>
