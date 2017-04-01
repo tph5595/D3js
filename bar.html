@@ -28,19 +28,26 @@
         font-size: 8em;
         color: #B2DFDB;
       }
-      div#bars {
+      div#box {
         background-color: #ECEFF1;
         padding: 50px;
         width: 600px;
-        box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
         border-radius: 15px;
+      }
+      .bars {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      }
+      .bars:hover {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
       }
     </style>
   </head>
   <body>
     <center>
       <h1>Pretty Bar Chart</h1>
-      <div id="bars">
+      <div id="box">
 
       </div>
     <script type="text/javascript">
@@ -51,27 +58,30 @@
       var spaceBetween = 1.25;
       var startColor = "#7C4DFF"; //Google Material design deep purple A200
       var endColor = "#1DE9B6";   //Google Material design teal A400
+      var scaleWidth = 10;
+      var scalePadding = 20;
+      var scaleColor = "#607D8B";
 
       //Functionality beyond this point
       var arrayMax = Math.max.apply(null, dataArr);
       var arraySize = dataArr.length;
 
-      var barWidth = width/arraySize;
+      var barWidth = (width-(scaleWidth+scalePadding))/arraySize;
       if(spaceBetween > 0){
-          barWidth = width/(arraySize*spaceBetween);
+          barWidth = (width-(scaleWidth+scalePadding))/(arraySize*spaceBetween);
       }
 
       var scaleh = d3.scaleLinear()
                     .domain([0, arrayMax])
-                    .range([0, height]);
+                    .range([0, height-2*(scaleWidth+scalePadding)]);
       var scalew = d3.scaleLinear()
                     .domain([0, (arraySize)-1])
-                    .range([0, width-(barWidth)]);
+                    .range([scaleWidth+scalePadding, width-(barWidth)-(scalePadding)]);
       var scalec = d3.scaleLinear()
                     .domain([0, arrayMax])
                     .range([startColor, endColor]);
 
-      var canvas = d3.select("div#bars")
+      var canvas = d3.select("div#box")
                         .append("svg")
                         .attr("width", width)
                         .attr("height", height)
@@ -84,10 +94,42 @@
                         .enter()
                             .append("rect")
                             .attr("width", barWidth)
-                            .attr("height", function(d) { return scaleh(d); })
-                            .attr("y", function(d) { return height-(scaleh(d)); })
+                            .attr("height", 0)
+                            .attr("y", height-(scaleWidth+scalePadding))
                             .attr("x", function(d, i) { return scalew(i); })
-                            .attr("fill", function(d){ return scalec(d); });
+                            .attr("fill", function(d){ return scalec(d); })
+                            .attr("class", "box");
+      var vertScale = canvas
+                        .append("line")
+                        .attr("x1", scaleWidth/2)
+                        .attr("y1", height)
+                        .attr("x2", scaleWidth/2)
+                        .attr("y2", height)
+                        .attr("stroke-width", scaleWidth)
+                        .attr("stroke", scaleColor);
+      var horScale = canvas
+                        .append("line")
+                        .attr("x1", 0)
+                        .attr("y1", height-(scaleWidth/2))
+                        .attr("x2", 0)
+                        .attr("y2", height-(scaleWidth/2))
+                        .attr("stroke-width", scaleWidth)
+                        .attr("stroke", scaleColor);
+
+
+      bars.transition()
+              .duration(750)
+              .delay(500)
+              .attr("y", function(d) { return height-(scaleh(d))-(scaleWidth+scalePadding); })
+              .attr("height", function(d) { return scaleh(d); });
+    horScale.transition()
+              .duration(750)
+              .delay(400)
+              .attr("x2", width);
+    vertScale.transition()
+              .duration(750)
+              .delay(400)
+              .attr("y1", 0);
     </script>
   </center>
   </body>
