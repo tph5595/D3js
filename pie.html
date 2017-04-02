@@ -31,13 +31,7 @@
 
         var arc = d3.arc()
             .innerRadius(size - chartWidth)
-            .outerRadius(size)
-            .startAngle(function(d, i) {
-                return (i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0;
-            })
-            .endAngle(function(d, i) {
-                return scaleP(d3.sum(dataArr.slice(0, i + 1)))
-            });
+            .outerRadius(size);
 
         var arcstart = d3.arc()
             .innerRadius(size - chartWidth)
@@ -55,38 +49,33 @@
             .data(dataArr)
             .enter()
             .append("path")
-            .attr("d", arc)
+            .attr("d", arcstart)
             .attr("fill", function(d) {
                 return scalec(d);
             });
-        /*    wedges.transition()
-                .duration(500)
-                .delay(400)
-                .attrTween("d", function(d, i) {
-                    return arcTweens(d, i);
-                });
-            wedges.transition()
-                .duration(500)
-                .delay(400)
-                .attrTween("d", function(d, i) {
-                    return arcTweene(d, i);
-                });
+        wedges.transition()
+            .duration(500)
+            .delay(400)
+            .attrTween("d", function(d, i) {
+                return arcTweens(d, i);
+            });
 
-            function arcTweens(b, i) {
-                var lat = d3.interpolate(
-                    0, (((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
-                return function(t) {
-                    return arc(lat(t));
-                };
-            }
-
-            function arcTweene(b, i) {
-                var lat = d3.interpolate(
-                    0, (scaleP(d3.sum(dataArr.slice(0, i + 1)))));
-                return function(t) {
-                    return arc(lat(t));
-                };
-            }*/
+        function arcTweens(d, i) {
+            var slat = d3.interpolate(
+                d.startAngle, (((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
+            var elat = d3.interpolate(
+                d.endAngle, (scaleP(d3.sum(dataArr.slice(0, i + 1)))));
+            console.log(d + "\t" + i);
+            console.log((((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
+            return function(t) {
+                var sa = slat(t);
+                var ea = elat(t);
+                //console.log(sa + "\t" + ea);
+                d.startAngle = sa;
+                d.endAngle = ea;
+                return arc(d);
+            };
+        }
     </script>
 
 </body>
