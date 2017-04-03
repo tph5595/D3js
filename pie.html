@@ -53,24 +53,33 @@
             .attr("fill", function(d) {
                 return scalec(d);
             });
+        wedges
+            .datum(function(d, i) {
+                console.log(d);
+                return {
+                    value: d,
+                    startAngle: 0,
+                    endAngle: 0,
+                    pos: i
+                };
+            });
         wedges.transition()
-            .duration(500)
+            .duration(750)
             .delay(400)
             .attrTween("d", function(d, i) {
                 return arcTweens(d, i);
             });
 
         function arcTweens(d, i) {
+            //console.log(d);
             var slat = d3.interpolate(
-                d.startAngle, (((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
+                0, (((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
             var elat = d3.interpolate(
-                d.endAngle, (scaleP(d3.sum(dataArr.slice(0, i + 1)))));
-            console.log(d + "\t" + i);
-            console.log((((i > 0) ? scaleP(d3.sum(dataArr.slice(0, i))) : 0)));
+                0, (scaleP(d3.sum(dataArr.slice(0, i + 1)))));
+            console.log(slat(0.1));
             return function(t) {
                 var sa = slat(t);
                 var ea = elat(t);
-                //console.log(sa + "\t" + ea);
                 d.startAngle = sa;
                 d.endAngle = ea;
                 return arc(d);
